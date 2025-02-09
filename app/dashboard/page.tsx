@@ -26,7 +26,8 @@ import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { Analytics } from '@/components/dashboard/analytics'
 import { Reports } from '@/components/dashboard/reports'
 import { Notifications } from '@/components/dashboard/notifications'
-
+import { ProfileCTA } from '@/components/dashboard/profile-cta'
+import { MissionsCard } from '@/components/dashboard/missions-card'
 export default function DashboardPage () {
   const { user } = useAuth()
 
@@ -51,7 +52,9 @@ export default function DashboardPage () {
           </Button>
         </div>
       </div>
-
+      {/* Profile Completion Card */}
+      <ProfileCTA />
+      <MissionsCard />
       {/* Stats Grid */}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <Card>

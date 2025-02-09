@@ -48,7 +48,11 @@ const rotatingWords = [
   'Rewards',
   'Coins',
   'Money',
-  'Experiences'
+  'Experiences',
+  'Crypto',
+  'Your future',
+  'Time',
+  'Investments'
 ]
 
 export function Hero () {
@@ -130,7 +134,7 @@ export function Hero () {
                       key={wordIndex}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
+                      exit={{ opacity: 0, y: -30 }}
                       className='inline-block'
                     >
                       {rotatingWords[wordIndex]}

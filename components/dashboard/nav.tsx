@@ -10,14 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Bell, Settings, LogOut, Wallet } from 'lucide-react'
+import { Bell, Settings, LogOut, Wallet, User } from 'lucide-react'
+import Link from 'next/link'
 
 export function DashboardNav () {
   const { user, signOut, publicKey } = useAuth()
 
   return (
     <header className='border-b'>
-      <div className='container mx-auto flex h-16 items-center justify-between'>
+      <div className='container flex h-16 items-center justify-between'>
         <h1 className='text-2xl font-bold'>Dashboard</h1>
         <div className='flex items-center gap-4'>
           <Button variant='ghost' size='icon'>
@@ -52,9 +53,17 @@ export function DashboardNav () {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className='mr-2 h-4 w-4' />
-                <span>Settings</span>
+              <DropdownMenuItem asChild>
+                <Link href='/dashboard/profile'>
+                  <User className='mr-2 h-4 w-4' />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href='/dashboard/settings'>
+                  <Settings className='mr-2 h-4 w-4' />
+                  <span>Settings</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()}>
