@@ -61,6 +61,7 @@ const internetCategories = [
 export default function InternetDataPage () {
   const { user, updateUserSettings } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
   const [masterToggle, setMasterToggle] = useState(false)
   const [categories, setCategories] = useState(
     internetCategories.reduce((acc, category) => {
@@ -71,51 +72,50 @@ export default function InternetDataPage () {
 
   // Initialize toggle states from user settings
   useEffect(() => {
-    if (user?.settings) {
-      const internetPrefs = user.settings.internet_data_preferences || {}
-      setCategories(prev =>
-        Object.keys(prev).reduce((acc, key) => {
-          acc[key] = internetPrefs[key] || false
-          return acc
-        }, {} as Record<string, boolean>)
-      )
-      setMasterToggle(Object.values(internetPrefs).some(value => value))
+    if (user?.settings?.internet_data_preferences) {
+      setCategories(user.settings.internet_data_preferences)
+      const allEnabled = Object.values(
+        user.settings.internet_data_preferences
+      ).every(value => value === true)
+      setMasterToggle(allEnabled)
     }
   }, [user?.settings])
 
-  const handleMasterToggle = async (checked: boolean) => {
-    try {
-      setIsLoading(true)
-      setMasterToggle(checked)
-
-      const newCategories = Object.keys(categories).reduce((acc, key) => {
-        acc[key] = checked
-        return acc
-      }, {} as Record<string, boolean>)
-      setCategories(newCategories)
-
-      await updateUserSettings({
-        internet_data_preferences: newCategories
-      })
-    } catch (error) {
-      console.error('Error updating settings:', error)
-    } finally {
-      setIsLoading(false)
-    }
+  const handleMasterToggle = (checked: boolean) => {
+    setMasterToggle(checked)
+    const newCategories = Object.keys(categories).reduce((acc, key) => {
+      acc[key] = checked
+      return acc
+    }, {} as Record<string, boolean>)
+    setCategories(newCategories)
+    setHasChanges(true)
   }
 
-  const handleCategoryToggle = async (id: string, checked: boolean) => {
+  const handleCategoryToggle = (id: string, checked: boolean) => {
+    const newCategories = { ...categories, [id]: checked }
+    setCategories(newCategories)
+
+    // Update master toggle if all categories are the same
+    const allSame = Object.values(newCategories).every(
+      value => value === checked
+    )
+    if (allSame) {
+      setMasterToggle(checked)
+    }
+
+    setHasChanges(true)
+  }
+
+  const handleSave = async () => {
     try {
       setIsLoading(true)
-      const newCategories = { ...categories, [id]: checked }
-      setCategories(newCategories)
-
-      const anyEnabled = Object.values(newCategories).some(value => value)
-      setMasterToggle(anyEnabled)
+      const anyEnabled = Object.values(categories).some(value => value)
 
       await updateUserSettings({
-        internet_data_preferences: newCategories
+        data_sharing: anyEnabled,
+        internet_preferences: categories
       })
+      setHasChanges(false)
     } catch (error) {
       console.error('Error updating settings:', error)
     } finally {
@@ -134,38 +134,33 @@ export default function InternetDataPage () {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='flex items-center justify-between border-b pb-4'>
-            <div>
-              <h3 className='font-semibold'>Master Control</h3>
-              <p className='text-sm text-muted-foreground'>
-                Toggle all internet data sharing
-              </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              {isLoading && <Icons.spinner className='h-4 w-4 animate-spin' />}
+          <div className='space-y-6'>
+            <div className='flex items-center justify-between border-b pb-4'>
+              <div>
+                <h3 className='font-semibold'>Master Control</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Toggle all internet data sharing
+                </p>
+              </div>
               <Switch
                 checked={masterToggle}
                 onCheckedChange={handleMasterToggle}
                 disabled={isLoading}
               />
             </div>
-          </div>
-          <div className='space-y-4 pt-4'>
-            {internetCategories.map(category => (
-              <div
-                key={category.id}
-                className='flex items-center justify-between'
-              >
-                <div>
-                  <h4 className='font-medium'>{category.name}</h4>
-                  <p className='text-sm text-muted-foreground'>
-                    {category.description}
-                  </p>
-                </div>
-                <div className='flex items-center gap-2'>
-                  {isLoading && (
-                    <Icons.spinner className='h-4 w-4 animate-spin' />
-                  )}
+
+            <div className='space-y-4'>
+              {internetCategories.map(category => (
+                <div
+                  key={category.id}
+                  className='flex items-center justify-between'
+                >
+                  <div>
+                    <h4 className='font-medium'>{category.name}</h4>
+                    <p className='text-sm text-muted-foreground'>
+                      {category.description}
+                    </p>
+                  </div>
                   <Switch
                     checked={categories[category.id]}
                     onCheckedChange={checked =>
@@ -174,8 +169,17 @@ export default function InternetDataPage () {
                     disabled={isLoading}
                   />
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <div className='flex justify-end pt-4'>
+              <Button onClick={handleSave} disabled={!hasChanges || isLoading}>
+                {isLoading && (
+                  <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
+                )}
+                Save Changes
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

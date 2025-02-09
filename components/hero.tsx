@@ -42,9 +42,19 @@ const visualizationContent = [
     color: 'from-orange-500 to-red-500'
   }
 ]
+
+const rotatingWords = [
+  'Digital Assets',
+  'Rewards',
+  'Coins',
+  'Money',
+  'Experiences'
+]
+
 export function Hero () {
   const [contentIndex, setContentIndex] = useState(0)
   const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [wordIndex, setWordIndex] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,6 +64,16 @@ export function Hero () {
     }, 5000)
 
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const wordInterval = setInterval(() => {
+      setWordIndex(current =>
+        current === rotatingWords.length - 1 ? 0 : current + 1
+      )
+    }, 3000)
+
+    return () => clearInterval(wordInterval)
   }, [])
 
   return (
@@ -103,7 +123,20 @@ export function Hero () {
                     <Sparkles className='h-3 w-3' />
                   </motion.span>
                 </span>
-                <span className='block mt-2'>Into Digital Assets</span>
+                <span className='block mt-2'>
+                  Into{' '}
+                  <AnimatePresence mode='wait'>
+                    <motion.span
+                      key={wordIndex}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className='inline-block'
+                    >
+                      {rotatingWords[wordIndex]}
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
               </motion.h1>
             </div>
 

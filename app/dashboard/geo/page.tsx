@@ -61,6 +61,7 @@ const geoCategories = [
 export default function GeoDataPage () {
   const { user, updateUserSettings } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
   const [masterToggle, setMasterToggle] = useState(false)
   const [categories, setCategories] = useState(
     geoCategories.reduce((acc, category) => {
@@ -81,47 +82,41 @@ export default function GeoDataPage () {
     }
   }, [user?.settings])
 
-  const handleMasterToggle = async (checked: boolean) => {
-    try {
-      setIsLoading(true)
-      setMasterToggle(checked)
-
-      // Update all categories
-      const newCategories = Object.keys(categories).reduce((acc, key) => {
-        acc[key] = checked
-        return acc
-      }, {} as Record<string, boolean>)
-      setCategories(newCategories)
-
-      // Update database
-      await updateUserSettings({
-        location_data_preferences: newCategories
-      })
-    } catch (error) {
-      console.error('Error updating settings:', error)
-    } finally {
-      setIsLoading(false)
-    }
+  const handleMasterToggle = (checked: boolean) => {
+    setMasterToggle(checked)
+    const newCategories = Object.keys(categories).reduce((acc, key) => {
+      acc[key] = checked
+      return acc
+    }, {} as Record<string, boolean>)
+    setCategories(newCategories)
+    setHasChanges(true)
   }
 
-  const handleCategoryToggle = async (id: string, checked: boolean) => {
+  const handleCategoryToggle = (id: string, checked: boolean) => {
+    const newCategories = { ...categories, [id]: checked }
+    setCategories(newCategories)
+
+    // Update master toggle if all categories are the same
+    const allSame = Object.values(newCategories).every(
+      value => value === checked
+    )
+    if (allSame) {
+      setMasterToggle(checked)
+    }
+    setHasChanges(true)
+  }
+
+  const handleSave = async () => {
     try {
       setIsLoading(true)
-      const newCategories = { ...categories, [id]: checked }
-      setCategories(newCategories)
+      // If any category is enabled, location_data_sharing should be true
+      const anyEnabled = Object.values(categories).some(value => value)
 
-      // Update master toggle if all categories are the same
-      const allSame = Object.values(newCategories).every(
-        value => value === checked
-      )
-      if (allSame) {
-        setMasterToggle(checked)
-      }
-
-      // Update database
       await updateUserSettings({
-        location_data_preferences: newCategories
+        location_data_sharing: anyEnabled,
+        location_data_preferences: categories
       })
+      setHasChanges(false)
     } catch (error) {
       console.error('Error updating settings:', error)
     } finally {
@@ -140,38 +135,32 @@ export default function GeoDataPage () {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='flex items-center justify-between border-b pb-4'>
-            <div>
-              <h3 className='font-semibold'>Master Control</h3>
-              <p className='text-sm text-muted-foreground'>
-                Toggle all location data sharing
-              </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              {isLoading && <Icons.spinner className='h-4 w-4 animate-spin' />}
+          <div className='space-y-6'>
+            <div className='flex items-center justify-between border-b pb-4'>
+              <div>
+                <h3 className='font-semibold'>Master Control</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Toggle all location data sharing
+                </p>
+              </div>
               <Switch
                 checked={masterToggle}
                 onCheckedChange={handleMasterToggle}
                 disabled={isLoading}
               />
             </div>
-          </div>
-          <div className='space-y-4 pt-4'>
-            {geoCategories.map(category => (
-              <div
-                key={category.id}
-                className='flex items-center justify-between'
-              >
-                <div>
-                  <h4 className='font-medium'>{category.name}</h4>
-                  <p className='text-sm text-muted-foreground'>
-                    {category.description}
-                  </p>
-                </div>
-                <div className='flex items-center gap-2'>
-                  {isLoading && (
-                    <Icons.spinner className='h-4 w-4 animate-spin' />
-                  )}
+            <div className='space-y-4'>
+              {geoCategories.map(category => (
+                <div
+                  key={category.id}
+                  className='flex items-center justify-between'
+                >
+                  <div>
+                    <h4 className='font-medium'>{category.name}</h4>
+                    <p className='text-sm text-muted-foreground'>
+                      {category.description}
+                    </p>
+                  </div>
                   <Switch
                     checked={categories[category.id]}
                     onCheckedChange={checked =>
@@ -180,8 +169,17 @@ export default function GeoDataPage () {
                     disabled={isLoading}
                   />
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <div className='flex justify-end pt-4'>
+              <Button onClick={handleSave} disabled={!hasChanges || isLoading}>
+                {isLoading && (
+                  <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
+                )}
+                Save Changes
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
