@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/auth-context'
 import { Icons } from '@/components/icons'
+import { FileUpload } from '@/components/ui/file-upload'
 
 const healthCategories = [
   {
@@ -195,7 +196,7 @@ export default function HealthDataPage () {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Sharing Management</CardTitle>
           <CardDescription>
@@ -229,7 +230,8 @@ export default function HealthDataPage () {
             <Button className='w-full'>Generate Sharing Link</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
+      <FileUpload category='health' />
     </div>
   )
 }
