@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { FileUpload } from '@/components/ui/file-upload'
 
 const internetCategories = [
   {
@@ -184,7 +185,7 @@ export default function InternetDataPage () {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Internet Data Sharing</CardTitle>
           <CardDescription>
@@ -216,7 +217,8 @@ export default function InternetDataPage () {
             <Button className='w-full'>Generate Sharing Link</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
+      <FileUpload category='internet' />
     </div>
   )
 }

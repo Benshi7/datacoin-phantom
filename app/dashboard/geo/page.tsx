@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { FileUpload } from '@/components/ui/file-upload'
 
 const geoCategories = [
   {
@@ -184,7 +185,7 @@ export default function GeoDataPage () {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Location Sharing Management</CardTitle>
           <CardDescription>
@@ -218,7 +219,8 @@ export default function GeoDataPage () {
             <Button className='w-full'>Generate Sharing Link</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
+      <FileUpload category='geo' />
     </div>
   )
 }

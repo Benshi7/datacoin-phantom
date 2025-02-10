@@ -172,18 +172,17 @@ export function FileUpload ({
 
   const handleDelete = async (fileId: string, fileUrl: string) => {
     try {
-      // Extract the path from the URL
+      // sacar la ruta del archivo
       const path = fileUrl.split('/').pop()
       if (!path) throw new Error('Invalid file path')
 
-      // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('user-data')
         .remove([`${category}/${path}`])
 
       if (storageError) throw storageError
 
-      // Delete from database
+      // eliminar de la db
       const { error: dbError } = await supabase
         .from('user_files')
         .delete()

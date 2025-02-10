@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { FileUpload } from '@/components/ui/file-upload'
 
 const financeCategories = [
   {
@@ -185,7 +186,7 @@ export default function FinanceDataPage () {
         </CardContent>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Financial Data Sharing</CardTitle>
           <CardDescription>
@@ -217,7 +218,8 @@ export default function FinanceDataPage () {
             <Button className='w-full'>Generate Sharing Link</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
+      <FileUpload category='finance' />
     </div>
   )
 }
