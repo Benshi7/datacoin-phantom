@@ -45,7 +45,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider ({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Profile | null>(null)
-  const [isLoading, setIsLoading] = useState(true) // Start as true to prevent flash
+  const [isLoading, setIsLoading] = useState(true) // que arranque 'cargando' para evitar re-renders innecesarios
   const [walletConnected, setWalletConnected] = useState(false)
   const [publicKey, setPublicKey] = useState<PublicKey | null>(null)
   const router = useRouter()
@@ -61,10 +61,9 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
     return provider
   }, [])
 
-  // Fetch user data from Supabase
+  // fetch userdata f supabase
   const fetchUserData = useCallback(async (walletAddress: string) => {
     try {
-      // Get or create profile
       let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -73,7 +72,6 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
 
       if (profileError) {
         if (profileError.code === 'PGRST116') {
-          // Profile doesn't exist, create it
           const { data: newProfile, error: createError } = await supabase
             .from('profiles')
             .insert([
@@ -95,7 +93,7 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Get user data
+      // get user data
       const { data: userData, error: userDataError } = await supabase
         .from('user_data')
         .select('*')
@@ -105,7 +103,7 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
       if (userDataError && userDataError.code !== 'PGRST116')
         throw userDataError
 
-      // Get user settings
+      // get user settings
       const { data: settings, error: settingsError } = await supabase
         .from('user_settings')
         .select('*')
@@ -115,28 +113,28 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
       if (settingsError && settingsError.code !== 'PGRST116')
         throw settingsError
 
-      // Get health data
+      // get health data
       const { data: healthData } = await supabase
         .from('health_data')
         .select('*')
         .eq('user_id', profile.id)
         .single()
 
-      // Get financial data
+      // get financial data
       const { data: financialData } = await supabase
         .from('financial_data')
         .select('*')
         .eq('user_id', profile.id)
         .single()
 
-      // Return the combined data
+      // return the combined data
       return {
         ...profile,
         ...userData,
         settings,
         health_data: healthData,
         financial_data: financialData,
-        // Add default values for dashboard display
+        // esto es para el dashboard, hardcoded hasta q cambie
         balance: userData?.balance ?? 1000,
         data_points: userData?.data_points ?? 150,
         active_shares: userData?.active_shares ?? 3,
@@ -144,7 +142,7 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
-      // Return mock data as fallback
+      // fallback
       return {
         id: walletAddress,
         wallet_address: walletAddress,
@@ -161,7 +159,7 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Initialize wallet connection
+  // initiate wallet connectionn
   useEffect(() => {
     const initializeWallet = async () => {
       const provider = getProvider()
@@ -252,10 +250,9 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
         throw new Error('Please install Phantom wallet')
       }
 
-      // Connect to Phantom
+      // connect al provider de phantom
       const response = await provider.connect()
 
-      // Directly handle the connection here instead of waiting for the event
       if (response.publicKey) {
         setWalletConnected(true)
         setPublicKey(response.publicKey)
@@ -283,21 +280,18 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
       const provider = getProvider()
 
       if (provider) {
-        // First clear our state
         setWalletConnected(false)
         setPublicKey(null)
         setUser(null)
         localStorage.removeItem('walletConnected')
 
-        // Then disconnect Phantom
         await provider.disconnect()
 
-        // Remove event listeners to prevent any reconnection attempts
         provider.removeAllListeners('connect')
         provider.removeAllListeners('disconnect')
       }
 
-      // Only redirect after everything is cleared
+      // limpiar todo y luego redireccionar
       router.push('/')
 
       toast({
@@ -329,7 +323,6 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      // Update local user state
       setUser(prev => {
         if (!prev) return prev
         return {

@@ -71,7 +71,6 @@ export default function FinanceDataPage () {
     }, {} as Record<string, boolean>)
   )
 
-  // Initialize toggle states from user settings
   useEffect(() => {
     if (user?.settings?.financial_data_preferences) {
       setCategories(user.settings.financial_data_preferences)
@@ -96,7 +95,6 @@ export default function FinanceDataPage () {
     const newCategories = { ...categories, [id]: checked }
     setCategories(newCategories)
 
-    // Update master toggle if all categories are the same
     const allSame = Object.values(newCategories).every(
       value => value === checked
     )
@@ -110,7 +108,7 @@ export default function FinanceDataPage () {
   const handleSave = async () => {
     try {
       setIsLoading(true)
-      // If any category is enabled, financial_data_sharing should be true
+
       const anyEnabled = Object.values(categories).some(value => value)
 
       await updateUserSettings({

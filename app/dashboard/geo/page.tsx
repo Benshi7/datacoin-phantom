@@ -71,11 +71,10 @@ export default function GeoDataPage () {
     }, {} as Record<string, boolean>)
   )
 
-  // Initialize toggle states from user settings
   useEffect(() => {
     if (user?.settings?.location_data_preferences) {
       setCategories(user.settings.location_data_preferences)
-      // Set master toggle if all categories are enabled
+
       const allEnabled = Object.values(
         user.settings.location_data_preferences
       ).every(value => value === true)
@@ -97,7 +96,6 @@ export default function GeoDataPage () {
     const newCategories = { ...categories, [id]: checked }
     setCategories(newCategories)
 
-    // Update master toggle if all categories are the same
     const allSame = Object.values(newCategories).every(
       value => value === checked
     )
@@ -110,7 +108,7 @@ export default function GeoDataPage () {
   const handleSave = async () => {
     try {
       setIsLoading(true)
-      // If any category is enabled, location_data_sharing should be true
+
       const anyEnabled = Object.values(categories).some(value => value)
 
       await updateUserSettings({
@@ -185,41 +183,6 @@ export default function GeoDataPage () {
         </CardContent>
       </Card>
 
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Location Sharing Management</CardTitle>
-          <CardDescription>
-            Share your location data with service providers
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='space-y-4'>
-            <div>
-              <label className='text-sm font-medium'>
-                Service Provider Email
-              </label>
-              <Input
-                type='email'
-                placeholder='provider@service.com'
-                className='mt-1'
-              />
-            </div>
-            <div>
-              <label className='text-sm font-medium'>Additional Notes</label>
-              <Textarea
-                placeholder='Add any specific instructions or notes...'
-                className='mt-1'
-              />
-            </div>
-            <div>
-              <p className='text-sm text-muted-foreground'>
-                Access will be valid for 30 minutes
-              </p>
-            </div>
-            <Button className='w-full'>Generate Sharing Link</Button>
-          </div>
-        </CardContent>
-      </Card> */}
       <FileUpload category='geo' />
     </div>
   )

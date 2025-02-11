@@ -71,7 +71,6 @@ export default function InternetDataPage () {
     }, {} as Record<string, boolean>)
   )
 
-  // Initialize toggle states from user settings
   useEffect(() => {
     if (user?.settings?.internet_data_preferences) {
       setCategories(user.settings.internet_data_preferences)
@@ -96,7 +95,6 @@ export default function InternetDataPage () {
     const newCategories = { ...categories, [id]: checked }
     setCategories(newCategories)
 
-    // Update master toggle if all categories are the same
     const allSame = Object.values(newCategories).every(
       value => value === checked
     )

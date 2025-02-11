@@ -1,4 +1,4 @@
-import { integer, pgTable, serial, timestamp, varchar, decimal } from "drizzle-orm/pg-core"
+/* import { integer, pgTable, serial, timestamp, varchar, decimal } from "drizzle-orm/pg-core"
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -29,3 +29,4 @@ export const userSessions = pgTable("user_sessions", {
   createdAt: timestamp("created_at").defaultNow(),
 })
 
+ */

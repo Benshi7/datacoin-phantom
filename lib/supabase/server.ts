@@ -1,11 +1,10 @@
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
-// Validate environment variables
+// env local
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Validate URL format
 const isValidUrl = (urlString: string) => {
   try {
     new URL(urlString)
@@ -15,39 +14,40 @@ const isValidUrl = (urlString: string) => {
   }
 }
 
-export function createClient() {
+export function createClient () {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Missing environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be defined",
+      'Missing environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be defined'
     )
   }
 
   if (!isValidUrl(supabaseUrl)) {
-    throw new Error("Invalid NEXT_PUBLIC_SUPABASE_URL: Must be a valid URL (e.g., https://your-project.supabase.co)")
+    throw new Error(
+      'Invalid NEXT_PUBLIC_SUPABASE_URL: Must be a valid URL (e.g., https://your-project.supabase.co)'
+    )
   }
 
   const cookieStore = cookies()
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
+      get (name: string) {
         return cookieStore.get(name)?.value
       },
-      set(name: string, value: string, options: any) {
+      set (name: string, value: string, options: any) {
         try {
           cookieStore.set({ name, value, ...options })
         } catch (error) {
-          console.error("Error setting cookie:", error)
+          console.error('Error setting cookie:', error)
         }
       },
-      remove(name: string, options: any) {
+      remove (name: string, options: any) {
         try {
-          cookieStore.set({ name, value: "", ...options })
+          cookieStore.set({ name, value: '', ...options })
         } catch (error) {
-          console.error("Error removing cookie:", error)
+          console.error('Error removing cookie:', error)
         }
-      },
-    },
+      }
+    }
   })
 }
-

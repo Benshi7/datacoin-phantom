@@ -1,7 +1,7 @@
--- Enable UUID extension
+
 create extension if not exists "uuid-ossp";
 
--- Create profiles table
+
 create table public.profiles (
   id uuid primary key default uuid_generate_v4(),
   wallet_address text unique not null,
@@ -10,7 +10,6 @@ create table public.profiles (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Create user_data table
 create table public.user_data (
   id uuid references public.profiles(id) on delete cascade primary key,
   balance decimal default 0,
@@ -21,7 +20,7 @@ create table public.user_data (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Create data_sharing_history table
+
 create table public.data_sharing_history (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid references public.profiles(id) on delete cascade,
@@ -30,7 +29,7 @@ create table public.data_sharing_history (
   shared_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Create user_settings table
+
 create table public.user_settings (
   user_id uuid references public.profiles(id) on delete cascade primary key,
   health_data_sharing boolean default false,
@@ -41,13 +40,13 @@ create table public.user_settings (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Enable Row Level Security
+
 alter table public.profiles enable row level security;
 alter table public.user_data enable row level security;
 alter table public.data_sharing_history enable row level security;
 alter table public.user_settings enable row level security;
 
--- Create policies
+
 create policy "Public profiles are viewable by everyone"
   on public.profiles for select
   using (true);
@@ -84,11 +83,10 @@ create policy "Users can update own settings"
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  -- Create initial user data
+
   insert into public.user_data (id)
   values (new.id);
-  
-  -- Create initial user settings
+
   insert into public.user_settings (user_id)
   values (new.id);
   
@@ -96,12 +94,12 @@ begin
 end;
 $$ language plpgsql security definer;
 
--- Create trigger for new user creation
+
 create trigger on_auth_user_created
   after insert on public.profiles
   for each row execute procedure public.handle_new_user();
 
--- Function to update updated_at timestamp
+
 create or replace function public.handle_updated_at()
 returns trigger as $$
 begin
@@ -110,7 +108,6 @@ begin
 end;
 $$ language plpgsql;
 
--- Create triggers for updated_at
 create trigger handle_profiles_updated_at
   before update on public.profiles
   for each row execute procedure public.handle_updated_at();
