@@ -1,5 +1,5 @@
 import React from 'react'
-import { Heart, MapPin, CreditCard, Users } from 'lucide-react'
+import { Heart, MapPin, CreditCard, Users, Globe } from 'lucide-react'
 
 const dataTypes = [
   {
@@ -11,7 +11,7 @@ const dataTypes = [
     gradient: 'from-red-500 to-pink-500'
   },
   {
-    name: 'Location Data',
+    name: 'Geo Data',
     description: 'Movement patterns and location preferences',
     icon: MapPin,
     examples: 'Routes, Places, Travel',
@@ -33,6 +33,14 @@ const dataTypes = [
     examples: 'Interests, Networks, Content',
     color: 'from-violet-500/20 to-purple-500/20',
     gradient: 'from-violet-500 to-purple-500'
+  },
+  {
+    name: 'Internet Data',
+    description: 'Browsing history and online behavior patterns',
+    icon: Globe,
+    examples: 'Searches, Sites, Preferences',
+    color: 'from-orange-500/20 to-amber-500/20',
+    gradient: 'from-orange-500 to-amber-500'
   }
 ]
 
